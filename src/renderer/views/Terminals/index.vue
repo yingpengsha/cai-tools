@@ -1,0 +1,34 @@
+<template>
+  <div id="terminals-view">
+    <split-pane :min-percent='22' :max-percent='40' :default-percent='22' split="vertical">
+      <template slot="paneL">
+        <console />
+      </template>
+      <template slot="paneR">
+        <terminals />
+      </template>
+    </split-pane>
+  </div>
+</template>
+
+<script>
+import Console from './Console';
+import Terminals from './Terminals';
+
+export default {
+  name: 'TerminalsView',
+  components: {
+    Console,
+    Terminals,
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+#terminals-view{
+  height: 100%;
+  width: 100%;
+}
+</style>
+
+
