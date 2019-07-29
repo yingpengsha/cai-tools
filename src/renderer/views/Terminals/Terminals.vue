@@ -13,7 +13,9 @@
         :label="item.title"
         :name="item.name"
       >
-        <terminal />
+        <div class="container">
+          <terminal :cols="cols" :rows="rows"/>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -32,6 +34,8 @@ export default {
         content: 'Tab 1 content',
       }],
       tabIndex: 1,
+      rows: 0,
+      cols: 0,
     };
   },
   methods: {
@@ -61,9 +65,19 @@ export default {
       this.editableTabsValue = activeName;
       this.editableTabs = tabs.filter(tab => tab.name !== targetName);
     },
+    resize() {
+      console.log('resizing');
+      const container = document.querySelectorAll('.container')[0];
+      const { width, height } = container.getBoundingClientRect();
+      this.cols = Math.floor(width / 7.17);
+      this.rows = Math.floor(height / 21) + 1;
+    },
   },
   components: {
     Terminal,
+  },
+  mounted() {
+    this.resize();
   },
 };
 </script>
@@ -81,6 +95,10 @@ export default {
       height: calc(100% - 40px);
       .el-tab-pane {
         height: 100%;
+        .container{
+          height: 100%;
+          width: 100%;
+        }
       }
     }
   }

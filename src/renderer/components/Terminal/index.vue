@@ -1,7 +1,5 @@
 <template>
-  <div id="terminal">
-    <div id="term" ref="xterm"></div>
-  </div>
+  <div id="term" ref="xterm"></div>
 </template>
 
 <script>
@@ -15,11 +13,28 @@ Terminal.applyAddon(fit);
 Terminal.applyAddon(attach);
 export default {
   name: 'mainPage',
+  props: {
+    cols: Number,
+    rows: Number,
+  },
   data() {
     return {
       term: null,
       ptyProcess: null,
+      resizeObserver: null,
+      recordOldValue: { // 记录下旧的宽高数据，避免重复触发回调函数
+        width: '0',
+        height: '0',
+      },
     };
+  },
+  watch: {
+    cols() {
+      this.resize();
+    },
+    rows() {
+      this.resize();
+    },
   },
   methods: {
     newPty() {
@@ -53,9 +68,13 @@ export default {
 
       this.term.open(container);
     },
+    resize() {
+      this.term.resize(this.cols, this.rows);
+      this.ptyProcess.resize(this.cols, this.rows);
+    },
     init() {
-      const container = this.$refs.xterm;
-      this.newTerm(container);
+      const { xterm } = this.$refs;
+      this.newTerm(xterm);
       this.newPty();
 
       this.term.on('data', (data) => {
@@ -64,16 +83,9 @@ export default {
       this.ptyProcess.on('data', (data) => {
         this.term.write(data.toString());
       });
-      this.term.on('resize', (v) => { console.log(v); });
-
-      setInterval(() => {
-        const { width, height } = document.getElementById('terminal').getBoundingClientRect();
-        console.log(height);
-        const cols = Math.floor(width / 7.17);
-        const rows = Math.floor(height / 21);
-        this.term.resize(cols, rows);
-        this.ptyProcess.resize(cols, rows);
-      }, 1000);
+      setTimeout(() => {
+        this.resize();
+      }, 1000 / 60);
     },
   },
   mounted() {
@@ -81,10 +93,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-#terminal{
-  width: 100%;
-  height: 100%;
-}
-</style>

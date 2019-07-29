@@ -1,11 +1,11 @@
 <template>
   <div id="terminals-view">
-    <split-pane :min-percent='22' :max-percent='40' :default-percent='22' split="vertical">
+    <split-pane v-on:resize="resize()" :min-percent='22' :max-percent='40' :default-percent='22' split="vertical">
       <template slot="paneL">
         <console />
       </template>
       <template slot="paneR">
-        <terminals />
+        <terminals ref="terminals"/>
       </template>
     </split-pane>
   </div>
@@ -20,6 +20,15 @@ export default {
   components: {
     Console,
     Terminals,
+  },
+  methods: {
+    resize() {
+      // TODO: resize 防抖
+      this.$refs.terminals.resize();
+    },
+  },
+  mounted() {
+    window.addEventListener('resize', () => { this.resize(); });
   },
 };
 </script>
