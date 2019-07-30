@@ -16,6 +16,9 @@
         <div class="container">
           <terminal :cols="cols" :rows="rows"/>
         </div>
+        <div class="container">
+          <terminal :cols="cols" :rows="rows"/>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -70,7 +73,7 @@ export default {
       const container = document.querySelectorAll('.container')[0];
       const { width, height } = container.getBoundingClientRect();
       this.cols = Math.floor(width / 7.17);
-      this.rows = Math.floor(height / 21) + 1;
+      this.rows = Math.floor(height / 21);
     },
   },
   components: {
@@ -96,8 +99,12 @@ export default {
       .el-tab-pane {
         height: 100%;
         .container{
-          height: 100%;
+          height: 50%;
           width: 100%;
+          background: black
+        }
+        .container:nth-of-type(2){
+          border-top:2px solid gray;
         }
       }
     }

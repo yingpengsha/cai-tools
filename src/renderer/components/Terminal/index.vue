@@ -3,8 +3,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { Terminal } from 'xterm';
-import defaultShell from 'default-shell';
 import 'xterm/dist/xterm.css';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
@@ -28,6 +28,11 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters([
+      'defaultShell',
+    ]),
+  },
   watch: {
     cols() {
       this.resize();
@@ -42,7 +47,7 @@ export default {
       env.LC_ALL = 'zh_CN.UTF-8';
       env.LANG = 'zh_CN.UTF-8';
       env.LC_CTYPE = 'zh_CN.UTF-8';
-      this.ptyProcess = pty.spawn(defaultShell, [], {
+      this.ptyProcess = pty.spawn(this.defaultShell, [], {
         name: 'xterm-color',
         cols: 108,
         rows: 21,
