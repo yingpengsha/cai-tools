@@ -1,8 +1,10 @@
 <template>
   <div id="console">
     <header>指令控制台</header>
-    <workspace />
-    <command />
+    <main>
+      <workspace />
+      <command />
+    </main>
   </div>
 </template>
 
@@ -36,6 +38,10 @@ export default {
     border-bottom: 1px solid #DCDFE6;
     background: #F0F2F5;
     font-size: 14px;
+  }
+  main{
+    height: calc(100% - 40px);
+    overflow: scroll;
   }
 }
 </style>

@@ -83,11 +83,9 @@ export default {
       this.newPty();
 
       this.term.on('data', (data) => {
-        console.log('term', data);
         this.ptyProcess.write(data);
       });
       this.ptyProcess.on('data', (data) => {
-        console.log('pty', data);
         this.term.write(data.toString());
       });
       setTimeout(() => {

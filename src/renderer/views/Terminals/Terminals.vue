@@ -20,12 +20,12 @@
       :key="term"
       :style="+editableTabsValue===index?'z-index:1':null"
     >
-      <div class="container">
+      <!-- <div class="container">
         <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
       </div>
       <div class="container">
         <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
