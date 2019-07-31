@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
+import folder from './services/folder';
 
 /**
  * Set `__static` path to static files in production
@@ -45,6 +46,8 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+folder.register();
 
 /**
  * Auto Updater

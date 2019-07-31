@@ -1,12 +1,25 @@
 <template>
   <div id="console">
     <header>指令控制台</header>
+    <workspace />
+    <command />
   </div>
 </template>
 
 <script>
+import Workspace from '@/components/Workspace';
+import Command from '@/components/Command';
 export default {
   name: 'Console',
+  data() {
+    return {
+      activeNames: ['1', '2'],
+    };
+  },
+  components: {
+    Workspace,
+    Command,
+  },
 };
 </script>
 

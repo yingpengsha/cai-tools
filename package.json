@@ -57,6 +57,7 @@
     "axios": "^0.18.0",
     "default-shell": "^1.0.1",
     "element-ui": "^2.10.1",
+    "fs": "^0.0.1-security",
     "node-pty": "^0.8.1",
     "path-exists": "^4.0.0",
     "vue": "^2.5.16",

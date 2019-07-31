@@ -13,7 +13,6 @@
       </el-form-item>
       <el-form-item size="large">
         <el-button size="small" type="primary" @click="saveSetting">保存配置</el-button>
-        <el-button size="small" @click="init">重置</el-button>
       </el-form-item>
     </el-form>
   </div>

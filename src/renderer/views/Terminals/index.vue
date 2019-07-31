@@ -1,6 +1,6 @@
 <template>
   <div id="terminals-view">
-    <split-pane v-on:resize="resize()" :min-percent='22' :max-percent='40' :default-percent='22' split="vertical">
+    <split-pane v-on:resize="resize()" :min-percent='32' :default-percent='32' split="vertical">
       <template slot="paneL">
         <console />
       </template>

@@ -3,43 +3,51 @@
     <el-tabs
       v-model="editableTabsValue"
       type="border-card"
-      closable
-      @tab-remove="removeTab"
+      @tab-remove="removeTerm"
       class="tabs"
     >
       <el-tab-pane
-        v-for="(item) in editableTabs"
-        :key="item.name"
-        :label="item.title"
-        :name="item.name"
+        v-for="(term,index) in termsPath"
+        :key="term"
+        :label="term"
+        :name="String(index)"
       >
-        <div class="container">
-          <terminal :cols="cols" :rows="rows"/>
-        </div>
-        <div class="container">
-          <terminal :cols="cols" :rows="rows"/>
-        </div>
       </el-tab-pane>
     </el-tabs>
+    <div
+      class="tabs-content"
+      v-for="(term,index) in termsPath"
+      :key="term"
+      :style="+editableTabsValue===index?'z-index:1':null"
+    >
+      <div class="container">
+        <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
+      </div>
+      <div class="container">
+        <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Terminal from '@/components/Terminal';
 export default {
   name: 'Terminals',
   data() {
     return {
-      editableTabsValue: '1',
-      editableTabs: [{
-        title: 'Tab 1',
-        name: '1',
-        content: 'Tab 1 content',
-      }],
-      tabIndex: 1,
+      editableTabsValue: '0',
+      tabIndex: 0,
       rows: 0,
       cols: 0,
     };
+  },
+  computed: {
+    ...mapGetters([
+      'termsPath',
+      'workspacePath',
+    ]),
   },
   methods: {
     addTab() {
@@ -51,7 +59,7 @@ export default {
       });
       this.editableTabsValue = newTabName;
     },
-    removeTab(targetName) {
+    removeTerm(targetName) {
       const tabs = this.editableTabs;
       let activeName = this.editableTabsValue;
       if (activeName === targetName) {
@@ -90,23 +98,29 @@ export default {
   width: 100%;
   height: 100%;
   background: white;
+  position: relative;
+  .tabs-content{
+    background: black;
+    width: 100%;
+    height: calc(100% - 40px);
+    display: flex;
+    position:absolute;
+    top:40px;
+    left: 0px;
+    z-index: -1;
+    .container{
+      height: 100%;
+      width: 50%;
+      background: black
+    }
+    .container:nth-of-type(2){
+      border-left:2px solid gray;
+    }
+  }
   .tabs{
     box-shadow: none;
-    height: calc(100% - 2px);
     .el-tabs__content {
       padding: 0 !important;
-      height: calc(100% - 40px);
-      .el-tab-pane {
-        height: 100%;
-        .container{
-          height: 50%;
-          width: 100%;
-          background: black
-        }
-        .container:nth-of-type(2){
-          border-top:2px solid gray;
-        }
-      }
     }
   }
 }

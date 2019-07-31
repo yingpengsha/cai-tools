@@ -1,5 +1,5 @@
 <template>
-  <div id="term" ref="xterm"></div>
+  <div id="term" ref="container"></div>
 </template>
 
 <script>
@@ -16,6 +16,7 @@ export default {
   props: {
     cols: Number,
     rows: Number,
+    path: String,
   },
   data() {
     return {
@@ -51,7 +52,7 @@ export default {
         name: 'xterm-color',
         cols: 108,
         rows: 21,
-        cwd: process.cwd(),
+        cwd: this.path || process.cwd(),
         env,
         encoding: null,
       });
@@ -68,7 +69,6 @@ export default {
           foreground: '#f0f0f0',
           selection: 'rgba(248,28,229,0.3)',
         },
-
       });
 
       this.term.open(container);
@@ -78,14 +78,16 @@ export default {
       this.ptyProcess.resize(this.cols, this.rows);
     },
     init() {
-      const { xterm } = this.$refs;
-      this.newTerm(xterm);
+      const { container } = this.$refs;
+      this.newTerm(container);
       this.newPty();
 
       this.term.on('data', (data) => {
-        this.ptyProcess.write(Buffer.from(data));
+        console.log('term', data);
+        this.ptyProcess.write(data);
       });
       this.ptyProcess.on('data', (data) => {
+        console.log('pty', data);
         this.term.write(data.toString());
       });
       setTimeout(() => {
