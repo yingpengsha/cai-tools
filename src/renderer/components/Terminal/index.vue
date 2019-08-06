@@ -8,15 +8,19 @@ import { Terminal } from 'xterm';
 import 'xterm/dist/xterm.css';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
+import processStore from '@/process';
+import * as processAction from '@/process/actionTypes';
 const pty = require('node-pty');
 Terminal.applyAddon(fit);
 Terminal.applyAddon(attach);
 export default {
-  name: 'mainPage',
+  name: 'Termainal',
   props: {
     cols: Number,
     rows: Number,
-    path: String,
+    workspacePath: String,
+    termPath: String,
+    groupKey: String,
   },
   data() {
     return {
@@ -32,6 +36,7 @@ export default {
   computed: {
     ...mapGetters([
       'defaultShell',
+      'process',
     ]),
   },
   watch: {
@@ -48,13 +53,19 @@ export default {
       env.LC_ALL = 'zh_CN.UTF-8';
       env.LANG = 'zh_CN.UTF-8';
       env.LC_CTYPE = 'zh_CN.UTF-8';
-      this.ptyProcess = pty.spawn(this.defaultShell, [], {
+      const ptyProcess = pty.spawn(this.defaultShell, [], {
         name: 'xterm-color',
         cols: 108,
         rows: 21,
-        cwd: this.path || process.cwd(),
+        cwd: this.workspacePath ? `${this.workspacePath}/${this.termPath}` : process.cwd(),
         env,
         encoding: null,
+      });
+      processStore.dispatch({
+        type: processAction.SET_PROCESS_PTY,
+        key: this.groupKey,
+        path: this.termPath,
+        pty: ptyProcess,
       });
     },
     newTerm(container) {
@@ -75,19 +86,22 @@ export default {
     },
     resize() {
       this.term.resize(this.cols, this.rows);
-      this.ptyProcess.resize(this.cols, this.rows);
+      processStore.getStateByKey('groups', this.groupKey, this.termPath).resize(this.cols, this.rows);
     },
     init() {
       const { container } = this.$refs;
       this.newTerm(container);
       this.newPty();
 
+
       this.term.on('data', (data) => {
-        this.ptyProcess.write(data);
+        console.log(Buffer.from(data));
+        processStore.getStateByKey('groups', this.groupKey, this.termPath).write(data);
       });
-      this.ptyProcess.on('data', (data) => {
+      processStore.getStateByKey('groups', this.groupKey, this.termPath).on('data', (data) => {
         this.term.write(data.toString());
       });
+
       setTimeout(() => {
         this.resize();
       }, 1000 / 60);

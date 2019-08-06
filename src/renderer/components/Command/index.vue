@@ -16,7 +16,7 @@
             :type="buttonClass[item.status]"
             :loading="item.status==='loading'"
             @click="control(item.detail,index)">
-            {{item.status === 'running' ? '停止' : '启动'}}
+            {{item.status === 'loading' ? '' : item.status === 'running' ? '停止' : '启动'}}
           </el-button>
         </div>
       </div>
@@ -42,15 +42,17 @@
 </template>
 
 <script>
+import processStore from '@/process';
+import * as processAction from '@/process/actionTypes';
 import { mapGetters } from 'vuex';
 import CommandForm from './form';
 export default {
   name: 'Command',
   data() {
     return {
-      commandsData: null,
+      commandsData: [],
       buttonClass: {
-        stop: 'success',
+        free: 'success',
         loadding: 'info',
         running: 'danger',
       },
@@ -77,31 +79,48 @@ export default {
     },
     updateCommandDetail(item, index) {
       this.commandIndex = index;
-      this.commandForm = item;
+      this.commandForm = JSON.parse(JSON.stringify(item));
       this.commandAction = 'UPDATE';
       this.commandDetailDrawer = true;
     },
     control(detail, index) {
-      const { status } = this.commandsData[index];
-      this.commandsData[index].status = 'loading';
-      setTimeout(() => {
-        this.commandsData[index].status = status === 'stop' ? 'running' : 'stop';
-      }, 2000);
+      const callback = (status) => {
+        this.commandsData[index].status = status;
+        this.$store.commit('UPDATE_COMMANDS', { commands: this.commandsData[index], index });
+      };
+      if (this.commandsData[index].status === 'free') {
+        this.commandsData[index].status = 'loading';
+        processStore.dispatch({
+          type: processAction.RUN_COMMANDS,
+          commands: this.commandsData[index],
+          callback,
+        });
+      } else {
+        this.commandsData[index].status = 'loading';
+        processStore.dispatch({
+          type: processAction.STOP_COMMANDS,
+          commands: this.commandsData[index],
+          callback,
+        });
+      }
     },
     closeDrawer() {
       this.commandDetailDrawer = false;
       this.getData();
     },
     getData() {
+      this.commandsData = JSON.parse(JSON.stringify(this.commandsList));
+    },
+    init() {
       for (let i = 0; i < this.commandsList.length; i += 1) {
         const element = this.commandsList[i];
-        element.status = 'stop';
+        element.status = 'free';
       }
-      this.commandsData = this.commandsList;
+      this.commandsData = JSON.parse(JSON.stringify(this.commandsList));
     },
   },
   created() {
-    this.getData();
+    this.init();
   },
   components: {
     CommandForm,

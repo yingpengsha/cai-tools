@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron' // eslint-disable-line
 import folder from './services/folder';
+import error from './services/error';
 
 /**
  * Set `__static` path to static files in production
@@ -48,6 +49,7 @@ app.on('activate', () => {
 });
 
 folder.register();
+error.register();
 
 /**
  * Auto Updater
