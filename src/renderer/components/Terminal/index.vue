@@ -8,15 +8,19 @@ import { Terminal } from 'xterm';
 import 'xterm/dist/xterm.css';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
+import processStore from '@/process';
+import * as processAction from '@/process/actionTypes';
 const pty = require('node-pty');
 Terminal.applyAddon(fit);
 Terminal.applyAddon(attach);
 export default {
-  name: 'mainPage',
+  name: 'Termainal',
   props: {
     cols: Number,
     rows: Number,
-    path: String,
+    workspacePath: String,
+    termPath: String,
+    groupKey: String,
   },
   data() {
     return {
@@ -52,9 +56,15 @@ export default {
         name: 'xterm-color',
         cols: 108,
         rows: 21,
-        cwd: this.path || process.cwd(),
+        cwd: this.workspacePath ? `${this.workspacePath}/${this.termPath}` : process.cwd(),
         env,
         encoding: null,
+      });
+      processStore.dispatch({
+        type: processAction.SET_PROCESS_PTY,
+        key: this.groupKey,
+        path: this.termPath,
+        pty: this.ptyProcess,
       });
     },
     newTerm(container) {
@@ -82,15 +92,17 @@ export default {
       this.newTerm(container);
       this.newPty();
 
+
       this.term.on('data', (data) => {
-        this.ptyProcess.write(data);
+        this.ptyProcess.write(Buffer.from(data));
       });
       this.ptyProcess.on('data', (data) => {
         this.term.write(data.toString());
       });
+
       setTimeout(() => {
         this.resize();
-      }, 1000 / 60);
+      }, 1000 / 2);
     },
   },
   mounted() {

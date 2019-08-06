@@ -88,14 +88,14 @@ export default {
           if (this.action === 'NEW') {
             this.$store.commit('NEW_COMMANDS', this.form);
           } else {
-            this.$store.commit('UPDATE_COMMANDS', this.form, this.key);
+            this.$store.commit('UPDATE_COMMANDS', { commands: this.form, index: this.index });
           }
           this.$emit('done');
         }
       });
     },
     removeCommands() {
-      this.$store.commit('REMOVE_COMMANDS', this.key);
+      this.$store.commit('REMOVE_COMMANDS', this.index);
       this.$emit('done');
     },
   },

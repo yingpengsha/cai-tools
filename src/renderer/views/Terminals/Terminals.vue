@@ -20,12 +20,15 @@
       :key="term"
       :style="+editableTabsValue===index?'z-index:1':null"
     >
-      <!-- <div class="container">
-        <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
+      <div class="container" v-for="group in Object.keys(process)" :key="group">
+        <terminal
+          :cols="cols"
+          :rows="rows"
+          :termPath="term"
+          :workspacePath="workspacePath"
+          :groupKey="group"
+        />
       </div>
-      <div class="container">
-        <terminal :cols="cols" :rows="rows" :path="`${workspacePath}/${term}`"/>
-      </div> -->
     </div>
   </div>
 </template>
@@ -33,6 +36,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import Terminal from '@/components/Terminal';
+import processStore from '@/process';
 export default {
   name: 'Terminals',
   data() {
@@ -41,6 +45,7 @@ export default {
       tabIndex: 0,
       rows: 0,
       cols: 0,
+      process: [],
     };
   },
   computed: {
@@ -77,17 +82,21 @@ export default {
       this.editableTabs = tabs.filter(tab => tab.name !== targetName);
     },
     resize() {
-      console.log('resizing');
-      const container = document.querySelectorAll('.container')[0];
+      const container = document.querySelectorAll('.tabs-content')[0];
       const { width, height } = container.getBoundingClientRect();
-      this.cols = Math.floor(width / 7.17);
+      const termNum = Object.keys(processStore.getStateByKey('groups')).length;
+      this.cols = Math.floor(width / 7.17 / termNum);
       this.rows = Math.floor(height / 21);
+    },
+    init() {
+      this.process = processStore.getStateByKey('groups');
     },
   },
   components: {
     Terminal,
   },
   mounted() {
+    this.init();
     this.resize();
   },
 };
@@ -111,7 +120,7 @@ export default {
     .container{
       height: 100%;
       width: 50%;
-      background: black
+      background: black;
     }
     .container:nth-of-type(2){
       border-left:2px solid gray;
