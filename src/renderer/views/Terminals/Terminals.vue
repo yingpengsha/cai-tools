@@ -18,7 +18,7 @@
       v-for="(term,index) in termsPath"
       :key="term"
       :style="+editableTabsValue===index?'z-index:1':null"
-      v-loading="termsNum !== termsPath.length*2"
+      v-loading="termsNum != termsPath.length*2"
       element-loading-text="正在加载控制台"
       element-loading-spinner="el-icon-loading"
       element-loading-background="rgba(0, 0, 0, 0.8)"
@@ -54,6 +54,7 @@ export default {
     ...mapGetters([
       'termsPath',
       'workspacePath',
+      'process',
     ]),
   },
   methods: {

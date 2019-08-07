@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <div class="table" v-loading="commandsNum !== commands.length">
+    <div class="table" v-loading="commandsNum != commands.length">
       <div v-for="(commandItem,index) in commandsData" :key="commandItem.key">
         <CommandItem
           :commandItem="commandItem"
