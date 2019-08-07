@@ -1,4 +1,4 @@
-
+/* eslint-disable no-console */
 
 export default function createProcessStore(reducer, preloadedState) {
   const currentReducer = reducer;
@@ -19,7 +19,16 @@ export default function createProcessStore(reducer, preloadedState) {
   }
 
   function dispatch(action) {
-    currentState = currentReducer(currentState, action);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Before state:', currentState);
+      console.log('Current action:', action);
+
+      currentState = currentReducer(currentState, action);
+
+      console.log('Current State:', currentState);
+    } else {
+      currentState = currentReducer(currentState, action);
+    }
   }
 
   dispatch({ type: Symbol('INIT') });

@@ -3,7 +3,6 @@
     <el-tabs
       v-model="editableTabsValue"
       type="border-card"
-      @tab-remove="removeTerm"
       class="tabs"
     >
       <el-tab-pane
@@ -19,14 +18,18 @@
       v-for="(term,index) in termsPath"
       :key="term"
       :style="+editableTabsValue===index?'z-index:1':null"
+      v-loading="termsNum !== termsPath.length*2"
+      element-loading-text="正在加载控制台"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     >
-      <div class="container" v-for="group in Object.keys(process)" :key="group">
+      <div class="container" v-for="group in 2" :key="group">
         <terminal
           :cols="cols"
           :rows="rows"
           :termPath="term"
           :workspacePath="workspacePath"
-          :groupKey="group"
+          @instantiation="termsNum+=1"
         />
       </div>
     </div>
@@ -35,17 +38,16 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Terminal from '@/components/Terminal';
-import processStore from '@/process';
+// import Terminal from '@/components/Terminal';
 export default {
   name: 'Terminals',
   data() {
     return {
+      termsNum: 0,
       editableTabsValue: '0',
       tabIndex: 0,
       rows: 0,
       cols: 0,
-      process: [],
     };
   },
   computed: {
@@ -55,45 +57,21 @@ export default {
     ]),
   },
   methods: {
-    addTab() {
-      const newTabName = `${this.tabIndex += 1}`;
-      this.editableTabs.push({
-        title: 'New Tab',
-        name: newTabName,
-        content: 'New Tab content',
-      });
-      this.editableTabsValue = newTabName;
-    },
-    removeTerm(targetName) {
-      const tabs = this.editableTabs;
-      let activeName = this.editableTabsValue;
-      if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1];
-            if (nextTab) {
-              activeName = nextTab.name;
-            }
-          }
-        });
-      }
-
-      this.editableTabsValue = activeName;
-      this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-    },
     resize() {
       const container = document.querySelectorAll('.tabs-content')[0];
       const { width, height } = container.getBoundingClientRect();
-      const termNum = Object.keys(processStore.getStateByKey('groups')).length;
-      this.cols = Math.floor(width / 7.17 / termNum);
+      this.cols = Math.floor(width / 7.17 / 2);
       this.rows = Math.floor(height / 21);
     },
     init() {
-      this.process = processStore.getStateByKey('groups');
+      this.$store.commit('INIT_PROCESS');
     },
   },
   components: {
-    Terminal,
+    // Terminal,
+    Terminal: () => ({
+      component: import('@/components/Terminal'),
+    }),
   },
   mounted() {
     this.init();

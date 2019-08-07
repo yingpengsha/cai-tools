@@ -1,8 +1,8 @@
 const getters = {
-  commandsList: state => state.commands.commandsList,
+  commands: state => state.commands.commands,
   defaultShell: state => state.setting.defaultShell,
   workspacePath: state => state.setting.workspacePath,
-  termsPath: state => state.terms.path,
+  termsPath: state => state.termsPath.path,
 };
 
 export default getters;

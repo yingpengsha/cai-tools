@@ -1,4 +1,4 @@
-const terms = {
+const termsPath = {
   state: {
     path: [],
   },
@@ -10,4 +10,4 @@ const terms = {
   },
 };
 
-export default terms;
+export default termsPath;

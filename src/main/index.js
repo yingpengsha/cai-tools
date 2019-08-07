@@ -25,9 +25,14 @@ function createWindow() {
     minHeight: 563,
     minWidth: 1000,
     useContentSize: true,
+    // show: false,
   });
 
   mainWindow.loadURL(winURL);
+
+  // mainWindow.on('ready-to-show', () => {
+  //   mainWindow.show(); // 初始化后再显示
+  // });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -35,7 +40,6 @@ function createWindow() {
 }
 
 app.on('ready', createWindow);
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

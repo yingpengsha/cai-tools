@@ -87,7 +87,6 @@ export default {
     },
     getDirList() {
       const path = this.$store.getters.workspacePath;
-      console.log(path);
       const files = fs.readdirSync(path);
       const dirList = [];
       for (let i = 0; i < files.length; i += 1) {
@@ -103,7 +102,7 @@ export default {
     },
     submitTermList() {
       this.dialogVisible = false;
-      this.$store.commit('SET_TERMS', this.selectList);
+      this.$store.dispatch('setCommands', this.selectList);
     },
     openDialog() {
       this.getDirList();

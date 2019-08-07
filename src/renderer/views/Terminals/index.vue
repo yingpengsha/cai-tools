@@ -14,7 +14,6 @@
 <script>
 import Console from './Console';
 import Terminals from './Terminals';
-
 export default {
   name: 'TerminalsView',
   components: {

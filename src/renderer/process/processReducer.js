@@ -4,77 +4,85 @@ import * as actionTypes from './actionTypes';
 
 const initState = {
   groups: {
-    one: {
-      __status__: 'FREE',
-    },
-    two: {
-      __status__: 'FREE',
-    },
   },
 };
 
 export default function reducer(state = initState, action) {
   const { type } = action;
-  const { groups } = state;
   switch (type) {
+    // 创建线程组织
+    // action: {
+    //   type: SET_PROCESS_PATH_LIST,
+    //   pathList: ['app-web', ...]
+    // }
     case actionTypes.SET_PROCESS_PATH_LIST:
       const { pathList } = action;
-      const groupsKeys = Object.keys(groups);
-      groupsKeys.forEach((key) => {
-        groups[key] = Object.assign({});
-        pathList.forEach((path) => {
-          groups[key][path] = null;
-        });
+      pathList.forEach((path) => {
+        state.groups[path] = [];
       });
-      state.groups = groups;
       return state;
 
     // 设置线程组
+    // action: {
+    //   type: SET_PROCESS_PTY
+    //   path: 'app-web',
+    //   pty: UnixTerminal,
+    // }
     case actionTypes.SET_PROCESS_PTY:
-      const { key, path, pty } = action;
-      state.groups[key][path] = pty;
+      const { path, pty } = action;
+      if (!state.groups[path]) {
+        state.groups[path] = [];
+      }
+      state.groups[path].push({ pty, status: 'FREE' });
       return state;
 
-    // 运行命令集
-    case actionTypes.RUN_COMMANDS:
+    // 运行命令
+    // action: {
+    //   path: 'app-web',
+    //   key: command.key,
+    //   command: commandItem.command,
+    //   callback: callback()
+    // }
+    case actionTypes.RUN_COMMAND:
+      if (!action.command) {
+        action.callback('FREE');
+        return state;
+      }
       let isAllRunning = true;
-      for (const key in groups) {
-        if (groups.hasOwnProperty(key)) {
-          if (groups[key].__status__ === 'FREE') {
-            isAllRunning = false;
-            groups[key].__status__ = action.commands.key;
-            action.commands.detail.forEach((item) => {
-              groups[key][item.term].write(item.command);
-              groups[key][item.term].write(new Buffer([0x0d]));
-            });
-            break;
-          }
+      for (const process of state.groups[action.path]) {
+        if (process.status === 'FREE') {
+          isAllRunning = false;
+          process.status = action.key;
+          process.pty.write(Buffer.from(action.command));
+          process.pty.write(new Buffer([0x0d]));
+          break;
         }
       }
       if (isAllRunning) {
         ipcRenderer.send('open-error-by-process');
-        action.callback('free');
+        action.callback('FREE');
       } else {
-        action.callback('running');
+        action.callback('RUNNING');
       }
       return state;
 
-    // 停止命令集
-    case actionTypes.STOP_COMMANDS:
-      for (const key in groups) {
-        if (groups.hasOwnProperty(key)) {
-          if (groups[key].__status__ === action.commands.key) {
-            groups[key].__status__ = 'FREE';
-            action.commands.detail.forEach((item) => {
-              groups[key][item.term].write(new Buffer([0x03]));
-              groups[key][item.term].write(Buffer.from('clear'));
-              groups[key][item.term].write(new Buffer([0x0d]));
-            });
-            break;
-          }
+    // 停止命令
+    // action: {
+    //   path: 'app-web',
+    //   key: command.key,
+    //   callback: callback(),
+    // }
+    case actionTypes.STOP_COMMAND:
+      for (const process of state.groups[action.path]) {
+        if (process.status === action.key) {
+          process.status = 'FREE';
+          process.pty.write(new Buffer([0x03]));
+          process.pty.write(Buffer.from('clear'));
+          process.pty.write(new Buffer([0x0d]));
+          break;
         }
       }
-      action.callback('free');
+      action.callback('FREE');
       return state;
 
     default:

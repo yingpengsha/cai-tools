@@ -1,4 +1,4 @@
 export const SET_PROCESS_PATH_LIST = 'SET_PROCESS_PATH_LIST';
 export const SET_PROCESS_PTY = 'SET_PROCESS_PTY';
-export const RUN_COMMANDS = 'RUN_COMMANDS';
-export const STOP_COMMANDS = 'STOP_COMMANDS';
+export const RUN_COMMAND = 'RUN_COMMAND';
+export const STOP_COMMAND = 'STOP_COMMAND';

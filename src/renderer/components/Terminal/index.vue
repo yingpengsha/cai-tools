@@ -8,8 +8,6 @@ import { Terminal } from 'xterm';
 import 'xterm/dist/xterm.css';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
-import processStore from '@/process';
-import * as processAction from '@/process/actionTypes';
 const pty = require('node-pty');
 Terminal.applyAddon(fit);
 Terminal.applyAddon(attach);
@@ -60,9 +58,7 @@ export default {
         env,
         encoding: null,
       });
-      processStore.dispatch({
-        type: processAction.SET_PROCESS_PTY,
-        key: this.groupKey,
+      this.$store.commit('CREATE_PROCESS', {
         path: this.termPath,
         pty: this.ptyProcess,
       });
@@ -81,6 +77,7 @@ export default {
         },
       });
 
+      // FIXME: term.open 会暂时性阻塞渲染队列，可以考虑进程优化或者交互优化。
       this.term.open(container);
     },
     resize() {
@@ -99,10 +96,11 @@ export default {
       this.ptyProcess.on('data', (data) => {
         this.term.write(data.toString());
       });
+      this.resize();
+      this.ptyProcess.write(Buffer.from('clear'));
+      this.ptyProcess.write(new Buffer([0x0d]));
 
-      setTimeout(() => {
-        this.resize();
-      }, 1000 / 2);
+      this.$emit('instantiation');
     },
   },
   mounted() {

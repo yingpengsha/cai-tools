@@ -1,115 +1,86 @@
 <template>
-  <div id="command-update">
-    <el-form :model="form" status-icon ref="form" label-width="100px">
-      <el-form-item
-        label="指令集名称"
-        prop="name"
-        style="width:calc(100% - 20px)"
-        :rules="{ required: true, message: '请输入指令集名称', trigger: 'blur' }"
-      >
-        <el-input size="small" v-model="form.name" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item
-        v-for="(command, index) in form.detail"
-        :label="'指令 ' + (index + 1)"
-        :key="command.key"
-        :prop="'detail.' + index"
-        :rules="{
-          validator: validateCommand, trigger: 'blur'
-        }"
-      >
-        <el-col :span="10">
-          <el-select size="small" v-model="command.term" placeholder="请选择文件夹">
-            <el-option
-              v-for="path in termsPath"
-              :key="path"
-              :label="path"
-              :value="path">
-            </el-option>
-          </el-select>
-        </el-col>
-        <el-col :span="10">
-          <el-input size="small" v-model="command.command"></el-input>
-        </el-col>
-        <el-col :span="4">
-          <el-button size="small" @click.prevent="removeCommand(index)">删除</el-button>
-        </el-col>
-      </el-form-item>
-      <el-form-item>
-        <el-button size="small" type="primary" @click="submitCommands">保存指令集</el-button>
-        <el-button size="small" v-show="action==='UPDATE'" type="danger" @click="removeCommands">删除指令集</el-button>
-        <el-button size="small" @click="addCommand">增加指令</el-button>
-        <el-button size="small" @click="uploadByYaml" disabled>YAML 上传</el-button>
-      </el-form-item>
-    </el-form>
+  <div style="position:relative">
+    <div id="command-editor" @keyup.alt="saveData" ref="editor">
+    </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import YAML from 'yamljs';
+import CodeMirror from 'codemirror/lib/codemirror';
+import 'codemirror/lib/codemirror.css';
 export default {
-  name: 'CommandForm',
+  name: 'CommandsForm',
   props: {
-    form: Object,
-    index: Number,
-    action: String,
+    commandsData: Array,
   },
-  computed: {
-    ...mapGetters([
-      'termsPath',
-    ]),
+  data() {
+    return {
+      editor: null,
+    };
   },
   methods: {
-    uploadByYaml() {
+    updateData() {
+      this.$emit('yamlUpdate', YAML.parse(this.editor.getValue()));
+      // this.$store.commit('YAML_UPDATE_COMMANDS', YAML.parse(this.editor.getValue()));
+    },
+    init() {
+      this.editor = CodeMirror(this.$refs.editor, {
+        tabSize: 2,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        showCursorWhenSelecting: true,
+        // 显示行号
+        lineNumbers: true,
+        fullScreen: true,
+        mode: 'yaml',
+        theme: 'material',
+        lint: true,
+        gutters: ['CodeMirror-lint-markers'],
+      });
 
-    },
-    removeCommand(index) {
-      this.form.detail.splice(index, 1);
-    },
-    addCommand() {
-      this.form.detail.push({
-        term: null,
-        command: null,
-        key: +new Date(),
+      this.editor.setOption('extraKeys', {
+        // TODO: 截流
+        'Ctrl-S': () => (this.updateData()),
+        'Cmd-S': () => (this.updateData()),
       });
-    },
-    validateCommand(rule, value, callback) {
-      if (!(value.command && value.term)) {
-        callback(new Error('请选择文件夹或者填写指令'));
-      } else if (!this.termsPath.includes(value.term)) {
-        callback(new Error('工作区不存在该文件夹'));
-      } else {
-        callback();
+
+      const commands = {};
+      for (let i = 0; i < this.commandsData.length; i += 2) {
+        const element = this.commandsData[i];
+        const nextElement = this.commandsData[i + 1];
+        commands[element.path] = [element.command, nextElement.command];
       }
+      this.editor.setValue(YAML.stringify(commands, 3));
     },
-    submitCommands() {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          if (this.action === 'NEW') {
-            this.$store.commit('NEW_COMMANDS', this.form);
-          } else {
-            this.$store.commit('UPDATE_COMMANDS', { commands: this.form, index: this.index });
-          }
-          this.$emit('done');
-        }
-      });
-    },
-    removeCommands() {
-      this.$store.commit('REMOVE_COMMANDS', this.index);
-      this.$emit('done');
-    },
+  },
+  mounted() {
+    this.init();
   },
 };
 </script>
 
-<style lang="scss" scoped>
-#command-update{
+<style lang="scss" scope>
+.bar{
+  position: sticky;
+  top: 0;
+  height: 50px;
+  z-index: 10000;
+}
+.command-editor{
+  height: 100% ;
   width: 100%;
-  max-width: 600px;
-  padding:0 10px;
-  .el-col {
-    padding-right: 5px;
-  }
+  overflow: auto;
+}
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+
+.CodeMirror-scroll {
+  height: auto;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 </style>
 
