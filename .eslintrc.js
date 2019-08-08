@@ -6,7 +6,8 @@ module.exports = {
     },
     env: {
         browser: true,
-        node: true
+        node: true,
+        jest: true,
     },
     extends: 'airbnb-base',
     globals: {
@@ -33,6 +34,7 @@ module.exports = {
         'no-prototype-builtins': 0,
         'no-case-declarations': 0,
         'no-buffer-constructor': 0,
+        'no-template-curly-in-string': 0,
         // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
     }

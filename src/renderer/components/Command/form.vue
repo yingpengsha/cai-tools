@@ -1,6 +1,6 @@
 <template>
   <div style="position:relative">
-    <div id="command-editor" @keyup.alt="saveData" ref="editor">
+    <div id="command-editor" ref="editor">
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@ export default {
     };
   },
   methods: {
-    updateData() {
+    saveData() {
       this.$emit('yamlUpdate', YAML.parse(this.editor.getValue()));
       // this.$store.commit('YAML_UPDATE_COMMANDS', YAML.parse(this.editor.getValue()));
     },
@@ -41,8 +41,8 @@ export default {
 
       this.editor.setOption('extraKeys', {
         // TODO: 截流
-        'Ctrl-S': () => (this.updateData()),
-        'Cmd-S': () => (this.updateData()),
+        'Ctrl-S': () => (this.saveData()),
+        'Cmd-S': () => (this.saveData()),
       });
 
       const commands = {};
@@ -51,7 +51,9 @@ export default {
         const nextElement = this.commandsData[i + 1];
         commands[element.path] = [element.command, nextElement.command];
       }
-      this.editor.setValue(YAML.stringify(commands, 3));
+      if (this.commandsData.length) {
+        this.editor.setValue(YAML.stringify(commands, 3));
+      }
     },
   },
   mounted() {
@@ -60,13 +62,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scope>
-.bar{
-  position: sticky;
-  top: 0;
-  height: 50px;
-  z-index: 10000;
-}
+<style lang="scss">
 .command-editor{
   height: 100% ;
   width: 100%;
@@ -74,10 +70,12 @@ export default {
 }
 .CodeMirror {
   border: 1px solid #eee;
+  min-height: 300px;
   height: auto;
 }
 
 .CodeMirror-scroll {
+  min-height: 300px;
   height: auto;
   overflow-y: hidden;
   overflow-x: auto;

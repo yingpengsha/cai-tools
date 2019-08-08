@@ -1,5 +1,5 @@
 <template>
-  <div class="row" >
+  <div class="item" >
     <div class="col col-1">
       <el-checkbox :value="select" @change="handleCheckSingeChange"></el-checkbox>
     </div>
@@ -55,18 +55,10 @@ export default {
       this.$emit('handleCheckSingeChange', isSelect, this.index);
     },
     handleStopCommand(commandItem, index) {
-      this.commandsData[index].status = 'LOADING';
-      const callback = (status) => {
-        this.commandsData[index].status = status;
-      };
-      this.$store.commit('STOP_COMMAND', { commandItem, callback });
+      this.$emit('handleStopCommand', commandItem, index);
     },
     handleRunCommand(commandItem, index) {
-      this.commandsData[index].status = 'LOADING';
-      const callback = (status) => {
-        this.commandsData[index].status = status;
-      };
-      this.$store.commit('RUN_COMMAND', { commandItem, callback });
+      this.$emit('handleRunCommand', commandItem, index);
     },
   },
   mounted() {
@@ -75,9 +67,8 @@ export default {
 };
 </script>
 
-
-<style lang="scss">
-.row{
+<style lang="scss" scoped>
+.item{
   box-sizing: content-box;
   height: 35px;
   line-height: 35px;

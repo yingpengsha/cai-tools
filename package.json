@@ -17,7 +17,8 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": "npm run lint:fix",
-    "rebuild": "electron-rebuild node-pty"
+    "rebuild": "electron-rebuild node-pty",
+    "test": "jest"
   },
   "build": {
     "productName": "cai-tools",
@@ -72,6 +73,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.5.5",
     "ajv": "^6.5.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
@@ -100,8 +102,10 @@
     "eslint-loader": "^2.0.0",
     "eslint-plugin-html": "^4.0.3",
     "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jest": "^22.15.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^24.8.0",
     "mini-css-extract-plugin": "0.4.0",
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",

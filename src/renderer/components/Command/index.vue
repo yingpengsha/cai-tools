@@ -2,7 +2,18 @@
   <div id="command">
     <el-divider content-position="left">指令管理</el-divider>
 
-    <div class="row header">
+    <div class="row select">
+      <el-select v-model="envID" @change="currentEnvChange" size="mini" filterable placeholder="请选择环境">
+        <el-option
+          v-for="item in envList"
+          :key="item._id"
+          :label="item.title"
+          :value="item._id">
+        </el-option>
+      </el-select>
+    </div>
+
+    <div class="row">
       <div class="col col-1">
         <el-checkbox :indeterminate="indeterminate" v-model="checkAll" @change="handleCheckAllChange" />
       </div>
@@ -32,6 +43,8 @@
           :select="commandItem.select"
           @handleCheckSingeChange="handleCheckSingeChange"
           @instantiation="commandsNum+=1"
+          @handleRunCommand="handleRunCommand"
+          @handleStopCommand="handleStopCommand"
         />
       </div>
     </div>
@@ -50,11 +63,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import CommandForm from './form';
 export default {
   name: 'Command',
   data() {
     return {
+      envID: null,
       checkAll: false,
       checkNum: 0,
       commandsData: [],
@@ -69,6 +84,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters([
+      'currentEnv',
+      'envList',
+    ]),
     indeterminate() {
       return this.checkNum > 0 && this.checkNum !== this.commandsData.length;
     },
@@ -142,7 +161,11 @@ export default {
       });
       this.$store.commit('UPDATE_COMMANDS', this.commandsData);
     },
+    currentEnvChange(_id) {
+      this.$store.commit('SET_CURRENT_ENV', _id);
+    },
     init() {
+      this.envID = this.currentEnv._id;
       this.commandsData = this.commands;
       for (let i = 0; i < this.commandsData.length; i += 1) {
         const element = this.commandsData[i];
@@ -161,7 +184,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #command{
   display: block;
   padding: 0 10px;
@@ -177,6 +200,9 @@ export default {
     border-bottom: 1px solid #DCDFE6;
     text-align: center;
     font-size: 14px;
+  }
+  .select{
+    justify-content: flex-end;
   }
   .col{
     width: 100%;
@@ -200,9 +226,13 @@ export default {
     align-items: center;
   }
 }
+</style>
+
+<style lang="scss">
 .el-drawer__body{
   overflow: scroll;
 }
 </style>
+
 
 

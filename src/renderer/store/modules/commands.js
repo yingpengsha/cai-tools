@@ -1,3 +1,5 @@
+
+import { commandParse } from '@/util/commandParse';
 import processStore from '../../process';
 import * as processAction from '../../process/actionTypes';
 
@@ -48,11 +50,12 @@ const commands = {
       });
     },
     RUN_COMMAND(state, { commandItem, callback }) {
+      console.log(this);
       processStore.dispatch({
         type: processAction.RUN_COMMAND,
         key: commandItem.key,
         path: commandItem.path,
-        command: commandItem.command,
+        command: commandParse(commandItem.command, this.getters.currentEnv.env),
         callback,
       });
     },

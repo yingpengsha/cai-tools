@@ -11,6 +11,9 @@
       <el-form-item label="默认 Shell" prop="defaultShell">
         <el-input v-model="settingForm.defaultShell"></el-input>
       </el-form-item>
+      <el-form-item label="环境变量" prop="envList">
+        <env-table></env-table>
+      </el-form-item>
       <el-form-item size="large">
         <el-button size="small" type="primary" @click="saveSetting">保存配置</el-button>
       </el-form-item>
@@ -21,6 +24,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import pathExists from 'path-exists';
+import EnvTable from '@/components/EnvList';
 export default {
   name: 'Setting',
   data() {
@@ -65,11 +69,15 @@ export default {
   created() {
     this.init();
   },
+  components: {
+    EnvTable,
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 #setting{
+  box-sizing: border-box;
   padding:10px;
   padding-top: 30px;
   height: 100%;
