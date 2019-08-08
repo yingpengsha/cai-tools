@@ -8,6 +8,7 @@ import { Terminal } from 'xterm';
 import 'xterm/dist/xterm.css';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
+import getEnv from './env';
 const pty = require('node-pty');
 Terminal.applyAddon(fit);
 Terminal.applyAddon(attach);
@@ -55,7 +56,7 @@ export default {
         cols: 108,
         rows: 21,
         cwd: this.workspacePath ? `${this.workspacePath}/${this.termPath}` : process.cwd(),
-        env,
+        env: getEnv() || env,
         encoding: null,
       });
       this.$store.commit('CREATE_PROCESS', {
@@ -100,6 +101,8 @@ export default {
       this.ptyProcess.write(new Buffer([0x0d]));
 
       this.$emit('instantiation');
+
+      console.log(getEnv());
     },
   },
   mounted() {
