@@ -76,11 +76,10 @@ export default {
           selection: 'rgba(248,28,229,0.3)',
         },
       });
-
-      // FIXME: term.open 会暂时性阻塞渲染队列，可以考虑进程优化或者交互优化。
       this.term.open(container);
     },
     resize() {
+      console.log(this.cols, this.rows);
       this.term.resize(this.cols, this.rows);
       this.ptyProcess.resize(this.cols, this.rows);
     },

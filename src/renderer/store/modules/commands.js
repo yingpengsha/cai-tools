@@ -67,8 +67,8 @@ const commands = {
   },
   actions: {
     setCommands({ commit }, pathList) {
-      commit('INIT_COMMANDS', pathList);
       commit('SET_TERMS', pathList);
+      commit('INIT_COMMANDS', pathList);
       processStore.dispatch({
         type: processAction.SET_PROCESS_PATH_LIST,
         pathList,

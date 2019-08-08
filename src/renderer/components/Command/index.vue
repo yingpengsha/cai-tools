@@ -25,10 +25,11 @@
     </div>
 
     <div class="table" v-loading="commandsNum != commands.length">
-      <div v-for="(commandItem,index) in commandsData" :key="commandItem.key">
+      <div v-for="(commandItem, index) in commandsData" :key="commandItem.key">
         <CommandItem
           :commandItem="commandItem"
           :index="index"
+          :select="commandItem.select"
           @handleCheckSingeChange="handleCheckSingeChange"
           @instantiation="commandsNum+=1"
         />
@@ -113,7 +114,8 @@ export default {
       };
       this.$store.commit('RUN_COMMAND', { commandItem, callback });
     },
-    handleCheckSingeChange(isSelect) {
+    handleCheckSingeChange(isSelect, index) {
+      this.commandsData[index].select = isSelect;
       if (isSelect) {
         this.checkNum += 1;
       } else {

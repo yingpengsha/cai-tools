@@ -1,7 +1,7 @@
 <template>
   <div class="row" >
     <div class="col col-1">
-      <el-checkbox v-model="commandItem.select" @change="handleCheckSingeChange"></el-checkbox>
+      <el-checkbox :value="select" @change="handleCheckSingeChange"></el-checkbox>
     </div>
     <div class="col col-2">
       {{commandItem.path}}
@@ -34,6 +34,7 @@ export default {
   props: {
     commandItem: Object,
     index: Number,
+    select: Boolean,
   },
   data() {
     return {
@@ -44,9 +45,14 @@ export default {
       },
     };
   },
+  watch: {
+    commandItem() {
+      console.log(this.commandItem);
+    },
+  },
   methods: {
     handleCheckSingeChange(isSelect) {
-      this.$emit('handleCheckSingeChange', isSelect);
+      this.$emit('handleCheckSingeChange', isSelect, this.index);
     },
     handleStopCommand(commandItem, index) {
       this.commandsData[index].status = 'LOADING';
