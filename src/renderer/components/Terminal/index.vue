@@ -101,8 +101,6 @@ export default {
       this.ptyProcess.write(new Buffer([0x0d]));
 
       this.$emit('instantiation');
-
-      console.log(getEnv());
     },
   },
   mounted() {

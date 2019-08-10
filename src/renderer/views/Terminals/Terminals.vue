@@ -13,26 +13,30 @@
       >
       </el-tab-pane>
     </el-tabs>
-    <div
-      class="tabs-content"
-      v-for="(term,index) in termsPath"
-      :key="term"
-      :style="+editableTabsValue===index?'z-index:1':null"
-      v-loading="termsNum != termsPath.length*2"
-      element-loading-text="正在加载控制台"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
-    >
-      <div class="container" v-for="group in 2" :key="group">
-        <terminal
-          :cols="cols"
-          :rows="rows"
-          :termPath="term"
-          :workspacePath="workspacePath"
-          @instantiation="termsNum+=1"
-        />
+
+    <div v-if="$store.getters.termsPath.length">
+      <div
+        class="tabs-content"
+        v-for="(term,index) in termsPath"
+        :key="term"
+        :style="+editableTabsValue===index?'z-index:1':null"
+        v-loading="termsNum != termsPath.length*2"
+        element-loading-text="正在加载控制台"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      >
+        <div class="container" v-for="group in 2" :key="group">
+          <terminal
+            :cols="cols"
+            :rows="rows"
+            :termPath="term"
+            :workspacePath="workspacePath"
+            @instantiation="termsNum+=1"
+          />
+        </div>
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -52,17 +56,19 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'termsPath',
       'workspacePath',
       'process',
     ]),
+    termsPath() {
+      return this.$store.getters.termsPath.length ? this.$store.getters.termsPath : ['请导入文件夹'];
+    },
   },
   methods: {
     resize() {
-      const container = document.querySelectorAll('.tabs-content')[0];
+      const container = document.querySelectorAll('#terminals')[0];
       const { width, height } = container.getBoundingClientRect();
       this.cols = Math.floor(width / 7.17 / 2);
-      this.rows = Math.floor(height / 21);
+      this.rows = Math.floor((height - 40) / 21);
     },
     init() {
       this.$store.commit('INIT_PROCESS');
@@ -75,8 +81,8 @@ export default {
     }),
   },
   mounted() {
-    this.init();
     this.resize();
+    this.init();
   },
 };
 </script>
