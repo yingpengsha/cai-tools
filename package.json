@@ -55,7 +55,7 @@
     }
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "codemirror": "^5.48.2",
     "default-shell": "^1.0.1",
     "electron-is": "^3.0.0",
